@@ -1,0 +1,6 @@
+[submodule "Libraries/DtxCS"]
+	path = Libraries/DtxCS
+	url = https://github.com/InvoxiPlayGames/DtxCS.git
+[submodule "Libraries/GameArchives"]
+	path = Libraries/GameArchives
+	url = https://github.com/maxton/GameArchives.git
