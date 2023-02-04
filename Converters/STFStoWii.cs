@@ -41,11 +41,11 @@ namespace LavaManager.Converters
 
         public void CopyDTA()
         {
-            Directory.CreateDirectory($"{tempPath}/.rb3e/dta");
+            Directory.CreateDirectory($"{tempPath}/lava/dta");
             for(int i = 0; i < songs.Count; i++)
             {
                 songs.Array(i).Array("version")[1] = new DataAtom(1);
-                File.WriteAllText($"{tempPath}/.rb3e/dta/{Shortname(i)}.dta", songs.Array(i).ToString());
+                File.WriteAllText($"{tempPath}/lava/dta/{Shortname(i)}.dta", songs.Array(i).ToString());
             }
         }
 

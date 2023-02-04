@@ -98,9 +98,11 @@
             // 
             // finaliseAndExitToolStripMenuItem
             // 
+            this.finaliseAndExitToolStripMenuItem.Enabled = false;
             this.finaliseAndExitToolStripMenuItem.Name = "finaliseAndExitToolStripMenuItem";
             this.finaliseAndExitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.finaliseAndExitToolStripMenuItem.Text = "Finalise and Exit";
+            this.finaliseAndExitToolStripMenuItem.Visible = false;
             this.finaliseAndExitToolStripMenuItem.Click += new System.EventHandler(this.finaliseAndExitToolStripMenuItem_Click);
             // 
             // statusStrip

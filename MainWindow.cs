@@ -19,6 +19,7 @@ namespace LavaManager
     public partial class MainWindow : Form
     {
         string root;
+        bool pending;
 
         public MainWindow(string rootDirectory)
         {
@@ -30,7 +31,7 @@ namespace LavaManager
         {
             Text = $"{root} - LavaManager";
             // make sure we have the directories we need
-            Directory.CreateDirectory($"{root}.rb3e/dta");
+            Directory.CreateDirectory($"{root}lava/dta");
             Task.Run(LoadSongList);
         }
 
@@ -73,7 +74,7 @@ namespace LavaManager
         {
             ProgressUpdate("Loading song list...", 0, 0);
             List<ListViewItem> listViewItems = new List<ListViewItem>();
-            string[] dtaFiles = Directory.EnumerateFiles($"{root}.rb3e/dta", "*.dta").ToArray();
+            string[] dtaFiles = Directory.EnumerateFiles($"{root}lava/dta", "*.dta").ToArray();
             ProgressUpdate($"Loading song list (0/{dtaFiles.Length})...", 0, dtaFiles.Length);
             int doneFiles = 0;
             foreach (string file in dtaFiles)
@@ -156,6 +157,7 @@ namespace LavaManager
             if (openSTFSDialog.ShowDialog() == DialogResult.OK)
             {
                 if (openSTFSDialog.FileNames.Length == 0) return;
+                pending = true;
                 Task.Run(() =>
                 {
                     int totalImports = 0;
@@ -175,7 +177,7 @@ namespace LavaManager
         private void Finalise()
         {
             ProgressUpdate("Reading song list...", 0, 0);
-            string[] dtaFiles = Directory.EnumerateFiles($"{root}.rb3e/dta", "*.dta").ToArray();
+            string[] dtaFiles = Directory.EnumerateFiles($"{root}lava/dta", "*.dta").ToArray();
             ProgressUpdate($"Reading song list (0/{dtaFiles.Length})...", 0, dtaFiles.Length);
             DataArray fullsonglist = new DataArray();
             int doneFiles = 0;
@@ -209,6 +211,7 @@ namespace LavaManager
             }
             if (!File.Exists($"{root}songs/gen/songs.dtb"))
             {
+                // this is hacky, but it works
                 Directory.CreateDirectory($"{root}songs/gen");
                 File.WriteAllBytes($"{root}songs/gen/songs.dtb", Resources.songs);
             }
@@ -235,6 +238,7 @@ namespace LavaManager
                 DTX.ToDtb(fullsonglist, customsfile, 1, true);
             }
             ProgressDone($"Wrote {addedSongs} song{(addedSongs > 1 ? "s" : "")} to song cache!");
+            pending = false;
         }
 
         private void saveSongCacheToolStripMenuItem_Click(object sender, EventArgs e)
@@ -244,6 +248,7 @@ namespace LavaManager
 
         private void finaliseAndExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // seems to softlock the application
             Task.Run(Finalise).Wait();
             Application.Exit();
         }

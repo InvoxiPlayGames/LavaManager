@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -15,6 +16,7 @@ namespace LavaManager
     public partial class InitWindow : Form
     {
         List<DriveInfo> foundDrives = new List<DriveInfo>();
+        string detectedDolphinPath = "";
 
         public InitWindow()
         {
@@ -29,6 +31,20 @@ namespace LavaManager
         private void refreshDriveListButton_Click(object sender, EventArgs e)
         {
             RefreshDriveList();
+        }
+
+        private void DetectDolphinPath()
+        {
+            // TODO: check dolphin config files to see if Wii SD path is set to another place
+            string checkingFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Dolphin Emulator\\Load\\WiiSDSync\\";
+            if (Directory.Exists(checkingFolder))
+            {
+                detectedDolphinPath = checkingFolder;
+                useDolphinButton.Enabled = true;
+                detectedDolphinDir.Text = "Dolphin detected!";
+                detectedDolphinDir.Enabled = true;
+                fullPathTooltip.SetToolTip(detectedDolphinDir, detectedDolphinPath);
+            }
         }
 
         private void RefreshDriveList()
@@ -62,6 +78,7 @@ namespace LavaManager
             {
                 sdCardBox.SelectedIndex = 0;
             }
+            DetectDolphinPath();
             Program.pw.Hide();
         }
 
@@ -82,6 +99,33 @@ namespace LavaManager
         private void githubLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             Process.Start("https://github.com/InvoxiPlayGames/LavaManager");
+        }
+
+        private void selectFolderButton_Click(object sender, EventArgs e)
+        {
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
+            dialog.Title = "Select the \"rb3\" folder to use";
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                if (!dialog.FileName.ToLower().EndsWith("\\rb3"))
+                {
+                    MessageBox.Show("The folder you have selected is not named 'rb3'.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                } else
+                {
+                    Hide();
+                    new MainWindow(dialog.FileName + "\\").ShowDialog();
+                    Application.Exit();
+                }
+            }
+        }
+
+        private void useDolphinButton_Click(object sender, EventArgs e)
+        {
+            Hide();
+            Directory.CreateDirectory(detectedDolphinPath + "rb3\\");
+            new MainWindow(detectedDolphinPath + "rb3\\").ShowDialog();
+            Application.Exit();
         }
     }
 }
