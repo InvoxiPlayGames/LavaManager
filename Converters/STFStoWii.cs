@@ -16,7 +16,6 @@ namespace LavaManager.Converters
     {
         private STFSPackage stfs;
         private DataArray songs;
-        private string outDTAName;
         private string tempPath;
         private string output;
 
@@ -26,10 +25,9 @@ namespace LavaManager.Converters
             output = outPath;
             songs = DTX.FromPlainTextBytes(stfs.GetFile("songs/songs.dta").GetBytes());
             if (songs.Count > 1) // if we have multiple songs, use the name of the STFS for our output
-                outDTAName = stfs.FileName;
+                tempPath = Program.TempDir + stfs.FileName;
             else
-                outDTAName = songs.Array(0).Name;
-            tempPath = Program.TempDir + outDTAName;
+                tempPath = Program.TempDir + songs.Array(0).Name;
             Directory.CreateDirectory(tempPath);
         }
 

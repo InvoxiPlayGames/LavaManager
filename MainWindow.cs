@@ -86,23 +86,47 @@ namespace LavaManager
                     DataArray song = songs.Array(i);
                     //Console.WriteLine(song.ToString());
                     string shortname = song.Array("song").Array("name").String(1).Split('/')[1];
-                    FileInfo moggInfo, midInfo, artInfo, miloInfo;
+                    FileInfo moggInfo, bikInfo, wavInfo, midInfo, artInfo, miloInfo;
                     long songSize;
                     try
                     {
-                        moggInfo = new FileInfo($"{root}songs/{shortname}/{shortname}.mogg");
                         midInfo = new FileInfo($"{root}songs/{shortname}/{shortname}.mid");
                         miloInfo = new FileInfo($"{root}songs/{shortname}/gen/{shortname}.milo_wii");
-                        songSize = moggInfo.Length + midInfo.Length + miloInfo.Length;
+                        songSize = midInfo.Length + miloInfo.Length;
                     } catch (Exception)
                     {
-                        continue; // if we don't have a mogg, mid or milo, ignore
+                        continue; // if we don't have a mid or milo, ignore
                     }
+                    try
+                    {
+                        moggInfo = new FileInfo($"{root}songs/{shortname}/{shortname}.mogg");
+                        songSize += moggInfo.Length;
+                    }
+                    catch (Exception)
+                    {
+                        try
+                        {
+                            bikInfo = new FileInfo($"{root}songs/{shortname}/{shortname}.bik");
+                            songSize += bikInfo.Length;
+                        }
+                        catch (Exception)
+                        {
+                            try
+                            {
+                                wavInfo = new FileInfo($"{root}songs/{shortname}/{shortname}.wav");
+                                songSize += wavInfo.Length;
+                            }
+                            catch (Exception) {
+                                continue; // if we don't have a mogg, bik or wav, ignore
+                            }
+                        }
+                    }
+
                     try
                     {
                         artInfo = new FileInfo($"{root}songs/{shortname}/gen/{shortname}_keep.png_wii");
                         songSize += artInfo.Length;
-                    } catch (Exception) {}
+                    } catch (Exception) {} // we don't care if we have album art or not
                     
                     string songName = song.Array("name").String(1);
                     string songArtist = song.Array("artist").String(1);
